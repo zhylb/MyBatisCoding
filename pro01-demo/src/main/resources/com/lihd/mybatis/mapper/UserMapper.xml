@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+两个对应 :
+UserMapper.xml中的namespace 对应 UserMapper.java 的全类名
+UserMapper.xml中子标签的id 对应 UserMapper中的方法
+
+
+过程 ：
+调用接口中的方法时 会根据namespace对应到 一个xml文件，然后在根据方法名和id对应到xml中的sql语句
+
+下面的关系是 一一对应的。
+javaBean - BeanMapper.java - BeanMapper.xml - t_bean表
+
+userType 和 userMap的区别
+userType ①使用于简答的查询。②属性名和字段名相同
+userMap  ①使用于复杂的查询一对多，多对一。②属性名和字段名不一致，需要映射。
+
+
+-->
+<mapper namespace="com.lihd.mybatis.mapper.UserMapper">
+
+    <!--    int insert();-->
+    <insert id="insert">
+        insert into t_user values (null, 'random','123',18,'m','random@gmail.com')
+    </insert>
+
+    <!--    void delete();-->
+    <delete id="delete">
+        delete from t_user where id = 2
+    </delete>
+
+    <!--    void update();-->
+    <update id="update">
+        update t_user set username = 'update' where id = 3
+    </update>
+
+    <!--    User selectById();-->
+    <select id="selectById" resultType="User">
+        select * from t_user where id = 4
+    </select>
+
+    <!--    List<User> selectAll();-->
+    <select id="selectAll" resultType="user">
+        select * from t_user
+    </select>
+</mapper>
