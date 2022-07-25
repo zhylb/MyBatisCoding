@@ -3,7 +3,6 @@ package com.lihd.test;
 import com.lihd.mybatis.mapper.ParameterMapper;
 import com.lihd.mybatis.pojo.User;
 import com.lihd.mybatis.util.SqlSessionUtils;
-import org.apache.ibatis.mapping.ParameterMap;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
 
@@ -17,11 +16,39 @@ import java.util.Map;
  * &#064;description : TODO
  * &#064;date : 2022/7/25 15:45
  */
-public class ParameterTest {
+public class ParameterMapperTest {
     private final ParameterMapper mapper;
     {
         SqlSession sqlSession = SqlSessionUtils.build();
         mapper = sqlSession.getMapper(ParameterMapper.class);
+    }
+
+
+
+    /**
+     * Test07 : 测试 使用@param注解
+     * mybatis还是会把参数值放到一个map中，每个值都对应了两个键（@param的值别写 @param1这类的）
+     * 格式一 ：@param(value = "") 里面具体的值
+     * 格式二 ：param1 , param2 从1开始
+     * 这里去后面看了一下源代码。确实如此。
+     */
+    @Test
+    public void test07 (){
+        User user = mapper.selectUserByParam("update", "123");
+        System.out.println("user = " + user);
+    }
+
+
+    /**
+     * Test06 : 测试 实体类作为参数
+     * 直接 #{} | ${} 取属性即可
+     * 这里的属性指的并不是 具体的那个字段，而是 -> getXxx 和 setXxx 中的xxx
+     *
+     */
+    @Test
+    public void test06 (){
+        User user = new User(0, "poker", "face", 18, "F", "hateMe@love.com");
+        mapper.insertUser(user);
     }
 
     /**
@@ -40,11 +67,12 @@ public class ParameterTest {
     }
 
 
+
     /**
      * Test04 : 测试有多个参数的情况
-     * mybatis会把多个参数放到一个map中 每个值多对应了两个键
+     * mybatis会把多个参数放到一个map中 每个值都对应了两个键
      * 格式一 ： arg0, arg1, arg2 ... 从0开始
-     * 格式二 ：param1,param2, ... 从2开始
+     * 格式二 ：param1,param2, ... 从1开始
      * 两种格式可以混合使用，因为都在一个map中。但是由于名字很奇怪，这种方式可能不常用。
      */
     @Test

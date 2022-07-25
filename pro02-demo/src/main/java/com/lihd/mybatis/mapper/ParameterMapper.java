@@ -1,11 +1,17 @@
 package com.lihd.mybatis.mapper;
 
 import com.lihd.mybatis.pojo.User;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
 
 public interface ParameterMapper {
+
+
+    User selectUserByParam(@Param("username") String username, @Param("password") String password);
+
+    void insertUser(User user);
 
 
 
