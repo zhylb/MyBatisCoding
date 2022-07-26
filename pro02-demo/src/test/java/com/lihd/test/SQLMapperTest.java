@@ -7,6 +7,7 @@ import com.lihd.mybatis.util.SqlSessionUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
 
+import java.sql.*;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -52,5 +53,53 @@ public class SQLMapperTest {
     public void selectFromDynamicTable() {
         List<User> list = mapper.selectFromDynamicTable("t_user");
         list.forEach(System.out::println);
+    }
+    /*
+     * 获取自增的主键值
+     * userGeneratedKeys 代表包含了主键
+     * keyProperty 代表 把获取的自增主键设置到 User的id属性中
+     * 注意 不能通过返回值设置，因为返回值 代表的含义已经固定 ： 就是受到影响的行数。
+     */
+    @Test
+    public void insertUser() {
+        User user = new User(null, "北京东路", "ts", 18, "女", "nan@mem.org");
+        System.out.println(user);
+        mapper.insertUser(user);
+        System.out.println(user);
+    }
+
+    /*
+     * 回顾jdbc 如何获取自增的主键值。
+     * 既然jdbc能够做到，mybatis作为优秀的框架也一定有一种机制可以获取到这个值。
+     */
+    @Test
+    public void testJDBC() throws Exception {
+        Class.forName("com.mysql.jdbc.Driver");
+        String url = "jdbc:mysql://localhost:13306/mybatis";
+        String username = "root";
+        String password = "abc123";
+        Connection conn = DriverManager.getConnection(url, username, password);
+        String sql ="insert into t_user(id, username) values (?,?)";
+        //预编译sql对象时，要开启获取自增主键值，（不开启好像也没报错）
+        PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+        //设置 占位符的值 注意 index从1开始
+        ps.setObject(1, 0);
+        ps.setObject(2,"jdbc");
+
+        //不是update 因此要执行 executeUpdate 返回受到影响的行数
+        int line = ps.executeUpdate();
+
+        //通过 ps.getGeneratedKeys 获取结果集，自增的主键值就在其中。
+        ResultSet rs = ps.getGeneratedKeys();
+        ResultSetMetaData rsmd = rs.getMetaData();
+        int count = rsmd.getColumnCount();
+        if(rs.next()){
+            for (int i = 0; i < count; i++) {
+                System.out.println(rs.getObject(i + 1));
+            }
+        }
+
+        System.out.println("line = " + line);
     }
 }

@@ -30,4 +30,14 @@
         <!-- select * from #{tableName} -->
         select * from ${tableName}
     </select>
+
+    <!--void insertUser(User user);-->
+    <!--
+        userGeneratedKeys 代表包含了主键
+        keyProperty 代表 把获取的自增主键设置到 User的id属性中
+        注意 不能通过返回值设置，因为返回值 代表的含义已经固定 ： 就是受到影响的行数。
+    -->
+    <insert id="insertUser" useGeneratedKeys="true" keyProperty="id">
+        insert into t_user values (null, #{username},#{password},#{age},#{sex},#{email})
+    </insert>
 </mapper>

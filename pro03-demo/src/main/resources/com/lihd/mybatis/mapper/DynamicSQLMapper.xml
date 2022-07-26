@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lihd.mybatis.mapper.DynamicSQLMapper">
+
+
+    <sql id="empAllColumns">
+        eid, emp_name, age, sex, email, did
+    </sql>
+
+    <!-- int deleteBatchByArray(@Param("ids") Integer[] ids); -->
+    <delete id="deleteBatchByArray">
+        <!-- delete from t_emp where eid in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach> -->
+
+        <!-- 不要用where标签 因为可能全删了 还是报错比较好  -->
+        delete from t_emp where
+
+                <foreach collection="ids" item="id" separator="OR">
+                    eid = #{id}
+                </foreach>
+
+    </delete>
+
+
+    <!-- int insertBatchByList(@Param("emps") List<Emp> emps); -->
+    <insert id="insertBatchByList">
+        insert into t_emp values
+            <foreach collection="emps" item="emp" separator=",">
+                (null, #{emp.empName},#{emp.age},#{emp.sex},#{emp.email},null)
+            </foreach>
+    </insert>
+
+    <!-- String getEmpAgeJudge(Emp emp); -->
+    <select id="getEmpAgeJudge" resultType="string">
+        select
+        <choose>
+             <when test="age > 60">
+                 '廉颇老矣 尚能饭否'
+             </when>
+            <when test="age > 40">
+                '不惑之年 益当稳重'
+            </when>
+            <when test="age > 18">
+                '若发冲冠 匹马杀敌'
+            </when>
+            <otherwise>
+                    <!-- age 为null时来到这种情况-->
+                'FBI Warnning!!!'
+            </otherwise>
+        </choose>
+            from dual;
+    </select>
+
+
+    <!-- List<Emp> selectByEqCondition(Emp emp); -->
+
+
+    <select id="selectByEqCondition" resultType="emp">
+        select <include refid="empAllColumns"/> from t_emp
+        <trim prefix="where"  suffixOverrides="and|or">
+            <if test="empName != null and empName != ''">
+                emp_name = #{empName} and
+            </if>
+            <if test="age != null and  age != ''">
+                age = #{age} and
+            </if>
+            <if test="sex != null and  sex != ''">
+                sex = #{sex} and
+            </if>
+            <if test="email != null and  email != ''">
+                email = #{email} and
+            </if>
+        </trim>
+
+    </select>
+
+    <select id="selectByEqConditionOld2" resultType="emp">
+        select * from t_emp
+        <where>
+            <if test="empName != null and empName != ''">
+                and emp_name = #{empName}
+            </if>
+            <if test="age != null and  age != ''">
+                and age = #{age}
+            </if>
+            <if test="sex != null and  sex != ''">
+                and sex = #{sex}
+            </if>
+            <if test="email != null and  email != ''">
+                and email = #{email}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="selectByEqConditionOld1" resultType="emp">
+        select * from t_emp  where
+            <if test="empName != null and empName != ''">
+                emp_name = #{empName}
+            </if>
+            <if test="age != null and  age != ''">
+                and age = #{age}
+            </if>
+            <if test="sex != null and  sex != ''">
+                and sex = #{sex}
+            </if>
+            <if test="email != null and  email != ''">
+                and email = #{email}
+            </if>
+    </select>
+</mapper>

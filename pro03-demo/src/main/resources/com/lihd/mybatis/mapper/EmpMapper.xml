@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lihd.mybatis.mapper.EmpMapper">
+
+    <!-- List<Emp> selectAll(); -->
+    <select id="selectAll" resultType="Emp">
+        <!-- select eid, emp_name empName, age, sex, email, did from t_emp -->
+        select * from t_emp
+    </select>
+
+    <!-- List<Emp> selectAllByMapping(); -->
+
+    <!--
+        id唯一表示，不能重复
+        type 映射java类的全类名或者别名
+
+        id标签 配置主键
+        result 配置其他标签
+
+        property 配置java类中的 属性名
+        column 配置SQL语句中的 字段名
+
+        不用全写，但是老师建议全写。
+        没有配置 empName时 如果在setting标签中配置了 驼峰命名法 那么依然能查出empName
+        因此为了检验效果，一定要把setting标签注释了。
+
+        为了解决属性名 与 字段名 不一致使用 这种 方式有点奢侈
+
+    -->
+    <resultMap id="empResultMap" type="Emp">
+        <id property="eid" column="eid"/>
+        <result property="empName" column="emp_name"/>
+        <result property="age" column="age"/>
+        <result property="sex" column="sex"/>
+        <result property="email" column="email"/>
+
+    </resultMap>
+    <select id="selectAllByMapping" resultMap="empResultMap">
+        select * from t_emp
+    </select>
+
+
+
+    <!-- Emp selectAllInfoById(@Param("eid") Integer eid); -->
+    <resultMap id="ManyToOneMethodOne" type="Emp">
+        <id property="eid" column="eid"/>
+        <result property="empName" column="emp_name"/>
+        <result property="dept.did" column="did"/>
+        <result property="dept.deptName" column="dept_name"/>
+    </resultMap>
+
+    <!--  有些情况不写全的话似乎就有问题了，如果不想记住这些情况，那么就全写-->
+    <resultMap id="ManyToOneMethodTwo" type="Emp">
+        <id property="eid" column="eid"/>
+        <result property="empName" column="emp_name"/>
+        <result property="age" column="age"/>
+        <result property="sex" column="sex"/>
+        <result property="email" column="email"/>
+        <association property="dept" javaType="Dept">
+            <id property="did" column="did"/>
+            <result property="deptName" column="dept_name"/>
+        </association>
+    </resultMap>
+
+    <select id="selectAllInfoById" resultMap="ManyToOneMethodTwo">
+        select * from t_emp left join t_dept on t_emp.did = t_dept.did where eid = #{eid}
+    </select>
+
+
+    <!-- 分两步查询 先差员工，再查员工的部门 -->
+    <!-- Emp selectAllInfoByStep(@Param("eid") Integer eid); -->
+    <resultMap id="ManyToOneMethodThree" type="Emp">
+        <id property="eid" column="eid"/>
+        <result property="empName" column="emp_name"/>
+        <association property="dept" fetchType="lazy" select="com.lihd.mybatis.mapper.DeptMapper.selectById" column="did"/>
+    </resultMap>
+    <select id="selectAllInfoByStep" resultMap="ManyToOneMethodThree">
+        select * from t_emp where eid = #{eid}
+    </select>
+
+    <!-- List<Emp> selectByDept(@Param("did") Integer did ); -->
+    <select id="selectByDept" resultType="emp">
+        select * from t_emp where did = #{did}
+    </select>
+
+</mapper>

@@ -21,4 +21,8 @@ public interface SQLMapper {
     List<User> selectFromDynamicTable(@Param("tableName") String tableName);
 
 
+
+    void insertUser(User user);
+
+
 }

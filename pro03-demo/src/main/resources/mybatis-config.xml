@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+
+    <properties resource="jdbc.properties"/>
+
+    <!--
+        配置驼峰命名法 需要
+        类中的属性名称 与 SQL 语句中的字段名称保持关联性
+        aaBbCc <-> aa_bb_cc
+     -->
+    <settings>
+        <!-- 开启延迟加载 只有开启延迟加载后 fetchType才有作用 否则默认就是eager-->
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+
+    <typeAliases>
+        <package name="com.lihd.mybatis.pojo"/>
+    </typeAliases>
+
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${jdbc.driver}"/>
+                <property name="url" value="${jdbc.url}"/>
+                <property name="username" value="${jdbc.username}"/>
+                <property name="password" value="${jdbc.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <mappers>
+        <package name="com.lihd.mybatis.mapper"/>
+    </mappers>
+</configuration>
