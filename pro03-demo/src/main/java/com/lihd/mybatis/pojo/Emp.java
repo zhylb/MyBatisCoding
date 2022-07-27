@@ -1,11 +1,15 @@
 package com.lihd.mybatis.pojo;
 
+import java.io.Serializable;
+
 /**
  * @author : 葬花吟留别1851053336@qq.com
  * &#064;description : TODO
  * &#064;date : 2022/7/26 10:10
  */
-public class Emp {
+public class Emp implements Serializable {
+
+    private static final long serialVersionUID = -7849794470749849840L;
     private Integer eid;
     private String empName;
     private Integer age;
